@@ -1,6 +1,5 @@
-## TODO - find out about how to scraped data to the sendEmail method
-## TODO - 
-
+# TODO - find out about how to scraped data to the sendEmail method
+# TODO - 
 # get_attribute('href') to get the URL of the post 
 #
 # div[contains(., "Desired text")]
@@ -20,21 +19,23 @@ with open('config.json', 'r+') as f:
 # set the path variable
 path = data['config']['chrome_driver']
 
+
 # main function
 def main():
     # array to hold the information / links for the jobs 
     tester()
 
-# method just to test 
+
+# method just to test
 def tester():
     driver = webdriver.Chrome(executable_path=path)
     driver.get(data['urls']['frcc'])
     driver.find_elements_by_xpath("//div[contains(@class, 'HR')]").get_attribute('href')
     driver.find_elements_by_xpath("//div[contains(@class, 'Human Resources')]").get_attribute('href')
-    
+
 
 # function to send the email 
-## TODO find out about how to pass info into the data
+# TODO find out about how to pass info into the data
 def sendEmail():
     try:
         # set up the SMTP server
@@ -52,6 +53,7 @@ def sendEmail():
         s.quit()
     except: 
         pass
+
 
 # driver
 if __name__ == "__main__":
