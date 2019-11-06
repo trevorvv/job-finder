@@ -1,15 +1,13 @@
 # TODO - find out about how to scraped data to the sendEmail method
-# TODO - 
-# get_attribute('href') to get the URL of the post 
-#
-# div[contains(., "Desired text")]
-# div[starts-with(., "Desired text")]
 
 # imports required
 import json
 import smtplib
+import datetime
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from email.mime.multipart import MIMEMultipart
+
 
 # load the json object
 with open('config.json', 'r+') as f:
@@ -20,39 +18,48 @@ with open('config.json', 'r+') as f:
 path = data['config']['chrome_driver']
 
 
-# main function
-def main():
-    # array to hold the information / links for the jobs 
-    tester()
-
-
 # method just to test
-def tester():
+def scanning():
     driver = webdriver.Chrome(executable_path=path)
-    driver.get(data['urls']['frcc'])
-    driver.find_elements_by_xpath("//div[contains(@class, 'HR')]").get_attribute('href')
-    driver.find_elements_by_xpath("//div[contains(@class, 'Human Resources')]").get_attribute('href')
+    for names, urls in data['urls'].items():
+        driver.get(urls)
+        try:
+            hr = driver.find_element(By.XPATH, "//*[contains(text(), 'HR')]").get_attribute('href')
+            if hr:
+                sendEmail(urls)
+            else:
+                continue
+        except:
+            continue
 
 
-# function to send the email 
-# TODO find out about how to pass info into the data
-def sendEmail():
+# function to send the email
+# TODO - set up the smtp to send emails
+def sendEmail(x):
+    date = datetime.date.today().strftime("%B" + " " + "%d" + " " + "%Y")
     try:
         # set up the SMTP server
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.starttls()
-        s.login(data['emails']['myEmail'], data['emails']['password'])
+        s.login(data['emails']['senderEmail'], data['emails']['password'])
         # create the message
         msg = MIMEMultipart()
-        msg['From'] = data['emails']['myEmail']
+        msg['From'] = data['emails']['senderEmail']
         msg['To'] = data['emails']['kelsEmail']
-        msg['Subject'] = "Here are your job listings for the day!"
+        msg['Subject'] = "Here are your job listings for " + date + "!"
+        msg.attach(x)
         # send the email
         s.send_message(msg)
         del msg
         s.quit()
-    except: 
+    except:
         pass
+
+
+# main function
+def main():
+    # array to hold the information / links for the jobs
+    scanning()
 
 
 # driver
